@@ -1,0 +1,69 @@
+---
+
+- name: Setup Webserver
+  hosts: webservgroup
+  become: yes
+  tasks:
+   - name: Install Apache httpd
+     yum:
+       name: httpd
+       state: present
+   - name: Start & Enable HTTPD
+     service:
+       name: httpd
+       state: started
+       enabled: yes
+
+   - name: Create default user
+     user:
+       name: admin
+       comment: sysadmin user
+       shell: /bin/bash
+       uid: 1005
+       generate_ssh_key: yes
+       ssh_key_bits: 2048
+       ssh_key_file: .ssh/id_rsa
+       password_expire_max: 30
+
+   - copy:
+      src: index.html
+      dest: /var/www/html/index.html
+
+- name: Setup Db-Server
+  hosts: dbgroup
+  become: yes
+    #vars:
+    #dbname: groups
+    #dbuser: devops
+  tasks:
+    - debug:
+        var: dbname
+    - debug:
+        msg: "Value of dbuser is {{dbuser}}"
+
+    - name: Install MariaDb
+      yum:
+        name: mariadb-server
+        state: present
+    - name: Start & Enable MariaDb
+      service:
+         name: mariadb
+         state: started
+         enabled: yes
+    - name: Install Python Mysql
+      yum:
+         name: MySQL-python
+         state: present
+
+    - name: Create a new database
+      mysql_db:
+        name: "{{ dbname }}"
+        state: present
+    - name: Add user to database
+      mysql_user:
+         name: "{{dbuser}}"
+         password: '*EE0D72C1085C46C5278932678FBE2C6A782821B4'
+         encrypted: yes
+         priv: '*.*:ALL'
+         state: present
+

@@ -1,0 +1,10 @@
+---
+
+# handlers file for post-install
+
+ - name: Restart NTP Service
+   service:
+      name: ntpd
+      state: restarted
+      enabled: yes
+

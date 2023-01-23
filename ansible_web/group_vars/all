@@ -1,0 +1,6 @@
+# Variables accessible by ALL hosts from Inventory
+dbuser: test-admin
+dbname: redhat
+USRN: globaluser
+COMM: value from group
+
